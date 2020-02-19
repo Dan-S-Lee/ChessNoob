@@ -43,3 +43,21 @@ for square in chess.SQUARES:
                     square%8] = 2 * int(c) - 1
                     
 print(board_array)
+
+def create_move_df(moves: str):
+    move_list = moves.replace('.','').split()
+    ind_list = move_list[::3]
+    white_list = move_list[1::3]
+    black_list = move_list[2::3]
+    
+    #cuts the list off according to the shortest one
+    move_len = min(len(ind_list), len(white_list), len(black_list))
+    
+    ind_list = ind_list[:move_len]
+    white_list = white_list[:move_len]
+    black_list = black_list[:move_len]
+    
+    #convert lists into dictionary then dataframe
+    move_dict = {'index': ind_list, 'white': white_list, 'black': black_list}
+    move_df = pd.DataFrame(move_dict)
+    return move_df
