@@ -44,6 +44,29 @@ for square in chess.SQUARES:
                     
 print(board_array)
 
+piece_dict = {}
+
+empty_row = [0] * 12
+
+for i in range(0, 6):
+    temp_row_w = [0] * 12
+    temp_row_b = [0] * 12
+    temp_row_w[i] = 1
+    temp_row_b[i + 6] = 1
+    piece_dict[piece_list[i]] = temp_row_w
+    piece_dict[piece_list[i+6]] = temp_row_b
+
+one_hot = []
+for square in chess.SQUARES:
+    square_piece = board.piece_at(square = square)
+    if square_piece:
+        piece_sym = square_piece.symbol()
+        one_hot.extend(piece_dict[piece_sym])
+    else:
+        one_hot.extend(empty_row)
+
+print(len(one_hot))
+
 def create_move_df(moves: str):
     move_list = moves.replace('.','').split()
     ind_list = move_list[::3]
