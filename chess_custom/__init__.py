@@ -35,6 +35,7 @@ import math
 import re
 import itertools
 import typing
+import numpy as np
 
 from typing import ClassVar, Callable, Counter, Dict, Generic, Hashable, Iterable, Iterator, List, Mapping, Optional, SupportsInt, Tuple, Type, TypeVar, Union
 
@@ -643,6 +644,29 @@ class BaseBoard:
         else:
             return KING
 
+    def generate_array(self):
+        row = [0] * 8
+        board_list = [[row for i in range(0,8)] for j in range(0,6)]
+        board_array = np.array(board_list)
+        for square in SQUARES_180:
+            mask = BB_SQUARES[square]
+    
+            if not self.occupied & mask:
+                continue
+            elif self.pawns & mask:
+                board_array[0, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+            elif self.knights & mask:
+                board_array[1, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+            elif self.bishops & mask:
+                board_array[2, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+            elif self.rooks & mask:
+                board_array[3, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+            elif self.queens & mask:
+                board_array[4, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+            else:
+                board_array[5, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
+        return board_array
+        
     def color_at(self, square: Square) -> Optional[Color]:
         """Gets the color of the piece at the given square."""
         mask = BB_SQUARES[square]
