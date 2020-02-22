@@ -8,8 +8,15 @@ Created on Tue Feb 18 16:06:46 2020
 import chess
 import pandas as pd
 import numpy as np
+import os
+import pathlib
 
-df = pd.read_csv('2019_df.csv')
+#get current directory to make compatible for non-windows
+current_dir = pathlib.Path('~/.spyder-py3/ChessAI').expanduser().resolve()
+os.chdir(str(current_dir))
+df_path = pathlib.Path('2019_df.csv')
+
+df = pd.read_csv(df_path)
 
 start_pos = chess.STARTING_FEN
 board = chess.Board(fen = start_pos)
