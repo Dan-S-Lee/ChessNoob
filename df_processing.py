@@ -90,4 +90,10 @@ def create_move_df(moves: str):
     #convert lists into dictionary then dataframe
     move_dict = {'index': ind_list, 'white': white_list, 'black': black_list}
     move_df = pd.DataFrame(move_dict)
+    move_df['index'] = move_df['index'].astype(str)
+    move_df.drop(move_df.tail(1).index, inplace = True)
     return move_df
+
+df['move_clean'] = df['moves'].apply(create_move_df)
+game_dict = dict(zip(df.index.values, df['move_clean']))
+result_dict = dict(zip(df.index.values, df['result']))
