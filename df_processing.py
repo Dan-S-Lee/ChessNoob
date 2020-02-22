@@ -12,7 +12,7 @@ import os
 import pathlib
 
 #get current directory to make compatible for non-windows
-current_dir = pathlib.Path('~/.spyder-py3/ChessAI').expanduser().resolve()
+current_dir = pathlib.Path('~/documents/python/ChessAI').expanduser().resolve()
 os.chdir(str(current_dir))
 df_path = pathlib.Path('2019_df.csv')
 
@@ -42,37 +42,37 @@ for square in chess.SQUARES:
     if square_piece:
         piece_sym = square_piece.symbol()
         c = square_piece.color
-        print('Square int - {}'.format(square))
-        print('Row - {}'.format(square//8))
-        print('Column - {}'.format(square%8))
         board_array[piece_dict[piece_sym], 
                     square//8, 
                     square%8] = 2 * int(c) - 1
                     
 print(board_array)
 
-piece_dict = {}
+def generate_dic():
+    dic = {}
+    for i in range(0, 6):
+        temp_row_w = [0] * 12
+        temp_row_b = [0] * 12
+        temp_row_w[i] = 1
+        temp_row_b[i + 6] = 1
+        dic[piece_list[i]] = temp_row_w
+        dic[piece_list[i+6]] = temp_row_b
+    return dic
 
-empty_row = [0] * 12
+piece_dict = generate_dic()
 
-for i in range(0, 6):
-    temp_row_w = [0] * 12
-    temp_row_b = [0] * 12
-    temp_row_w[i] = 1
-    temp_row_b[i + 6] = 1
-    piece_dict[piece_list[i]] = temp_row_w
-    piece_dict[piece_list[i+6]] = temp_row_b
-
-one_hot = []
-for square in chess.SQUARES:
-    square_piece = board.piece_at(square = square)
-    if square_piece:
-        piece_sym = square_piece.symbol()
-        one_hot.extend(piece_dict[piece_sym])
-    else:
-        one_hot.extend(empty_row)
-
-print(len(one_hot))
+def one_hot_array(board, dic):
+    one_hot = []
+    empty_row = [0] * 12
+    for square in chess.SQUARES:
+        square_piece = board.piece_at(square = square)
+        if square_piece:
+            piece_sym = square_piece.symbol()
+            one_hot.extend(dic[piece_sym])
+        else:
+            one_hot.extend(empty_row)
+    print(len(one_hot))
+    return one_hot
 
 def create_move_df(moves: str):
     move_list = moves.replace('.','').split()
@@ -97,3 +97,8 @@ def create_move_df(moves: str):
 df['move_clean'] = df['moves'].apply(create_move_df)
 game_dict = dict(zip(df.index.values, df['move_clean']))
 result_dict = dict(zip(df.index.values, df['result']))
+
+game_dict[0].to_csv('training_ex1.csv')
+
+#def create_training_example(board, moves):
+    
