@@ -666,7 +666,52 @@ class BaseBoard:
             else:
                 board_array[5, square//8, square%8] = 2 * int(bool(self.occupied_co[WHITE] & mask)) - 1
         return board_array
-        
+    def generate_one_hot(self):
+        one_hot = []
+        for square in SQUARES_180:
+            temp_array = [0] * 12
+            mask = BB_SQUARES[square]
+            if not self.occupied & mask:
+                one_hot.extend(temp_array)
+            elif self.pawns & mask:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6] = 1
+                one_hot.extend(temp_array)
+            elif self.knights & mask:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6 + 1] = 1
+                one_hot.extend(temp_array)
+            elif self.bishops & mask:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6 + 2] = 1
+                one_hot.extend(temp_array)
+            elif self.rooks & mask:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6 + 3] = 1
+                one_hot.extend(temp_array)
+            elif self.queens & mask:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6 + 4] = 1
+                one_hot.extend(temp_array)
+            else:
+                temp_array[int(bool(self.occupied_co[WHITE] & mask)) * 6 + 5] = 1
+                one_hot.extend(temp_array)
+        return one_hot
+    def positions(self):
+        positions_list = []
+        for square in SQUARES_180:
+            mask = BB_SQUARES[square]
+            
+            if not self.occupied & mask:
+                positions_list.append(0)
+            elif self.pawns & mask:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 1)
+            elif self.knights & mask:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 2)
+            elif self.bishops & mask:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 3)
+            elif self.rooks & mask:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 4)
+            elif self.queens & mask:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 5)
+            else:
+                positions_list.append(int(bool(self.occupied_co[WHITE] & mask)) * 6 + 6)
+        return positions_list
     def color_at(self, square: Square) -> Optional[Color]:
         """Gets the color of the piece at the given square."""
         mask = BB_SQUARES[square]

@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 18 16:06:46 2020
+Created on Tue Feb 18 11:23:29 2020
 
-@author: danie
+@author: daniel_lee
 """
 
-import chess
+import chess_custom as cc
 import pandas as pd
 import numpy as np
 import os
 import pathlib
 
 #get current directory to make compatible for non-windows
-current_dir = pathlib.Path('~/documents/python/ChessAI').expanduser().resolve()
+current_dir = pathlib.Path('~/documents/python scripts/ChessAI').expanduser().resolve()
 os.chdir(str(current_dir))
-df_path = pathlib.Path('2019_df.csv')
+df_path = pathlib.Path('2010_df.csv')
 
 df = pd.read_csv(df_path)
 
-start_pos = chess.STARTING_FEN
-board = chess.Board(fen = start_pos)
+start_pos = cc.STARTING_FEN
+board = cc.Board(fen = start_pos)
 
 row = [0] * 8
 board_list = [[row for i in range(0,8)] for j in range(0,6)]
@@ -37,7 +37,7 @@ for i in range(0, 6):
     piece_dict[piece_list[i]] = i
     piece_dict[piece_list[i+6]] = i
 
-for square in chess.SQUARES:
+for square in cc.SQUARES:
     square_piece = board.piece_at(square = square)
     if square_piece:
         piece_sym = square_piece.symbol()
@@ -45,7 +45,7 @@ for square in chess.SQUARES:
         board_array[piece_dict[piece_sym], 
                     square//8, 
                     square%8] = 2 * int(c) - 1
-                    
+board_array = board.generate_array()
 print(board_array)
 
 def generate_dic():
@@ -64,7 +64,7 @@ piece_dict = generate_dic()
 def one_hot_array(board, dic):
     one_hot = []
     empty_row = [0] * 12
-    for square in chess.SQUARES:
+    for square in cc.SQUARES:
         square_piece = board.piece_at(square = square)
         if square_piece:
             piece_sym = square_piece.symbol()
@@ -101,4 +101,3 @@ result_dict = dict(zip(df.index.values, df['result']))
 game_dict[0].to_csv('training_ex1.csv')
 
 #def create_training_example(board, moves):
-    
