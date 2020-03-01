@@ -6,15 +6,16 @@ Created on Tue Feb 18 11:23:29 2020
 """
 
 import chess_custom as cc
+import h5py
 import pandas as pd
 import numpy as np
 import os
 import pathlib
 
 #get current directory to make compatible for non-windows
-current_dir = pathlib.Path('~/documents/python scripts/ChessAI').expanduser().resolve()
+current_dir = pathlib.Path('~/documents/python/ChessAI').expanduser().resolve()
 os.chdir(str(current_dir))
-df_path = pathlib.Path('2010_df.csv')
+df_path = pathlib.Path('2019_df.csv')
 
 df = pd.read_csv(df_path)
 
@@ -46,7 +47,7 @@ for square in cc.SQUARES:
                     square//8, 
                     square%8] = 2 * int(c) - 1
 board_array = board.generate_array()
-print(board_array)
+#print(board_array)
 
 def generate_dic():
     dic = {}
@@ -94,10 +95,18 @@ def create_move_df(moves: str):
     move_df.drop(move_df.tail(1).index, inplace = True)
     return move_df
 
-df['move_clean'] = df['moves'].apply(create_move_df)
+df['move_clean'] = df['Moves'].astype(str).apply(create_move_df)
 game_dict = dict(zip(df.index.values, df['move_clean']))
-result_dict = dict(zip(df.index.values, df['result']))
+#result_dict = dict(zip(df.index.values, df['result']))
 
-game_dict[0].to_csv('training_ex1.csv')
+from training_set_generator import positions_tracker, generate_training_example
+
+with h5py.File('training_set.hdf5', 'w') as f:
+    for row in range(1000):
+        temp_df = game_dict[row]
+        training_ex, from_list, to_list = generate_training_example(temp_df)
+        x_data = f.create_dataset('game_' + str(row) +'_x', data = training_ex)
+        y1_data = f.create_dataset('game_' + str(row) + '_y1', data = from_list)
+        y2_data = f.create_dataset('game_' + str(row) + '_y2', data = to_list)
 
 #def create_training_example(board, moves):
