@@ -17,21 +17,23 @@ df.set_index(df.columns.values[0], inplace = True)
 
 def positions_tracker(positions_1, positions_2):
     squares_changed = []
+    from_array = [0] * 64
+    to_array = [0] * 64
     for i in range(len(positions_1)):
         if positions_1[i] != positions_2[i]:
             squares_changed.append(i)
     if len(squares_changed) > 2:
         for i in squares_changed:
             if positions_1[i] % 6 == 0:
-                moved_from = i
+                from_array[i] = 1
             if positions_2[i] % 6 == 0:
-                moved_to = i
+                to_array[i] = 1
     else:
         if positions_2[squares_changed[0]] == 0:
-            moved_from, moved_to = squares_changed[0], squares_changed[1]
+            from_array[squares_changed[0]], to_array[squares_changed[1]] = 1, 1
         else:
-            moved_from, moved_to = squares_changed[1], squares_changed[0]
-    return moved_from, moved_to
+            from_array[squares_changed[1]], to_array[squares_changed[0]] = 1, 1
+    return from_array, to_array
 def generate_training_example(move_set):
     piece_moved = {}
     board = cc.Board(fen = cc.STARTING_FEN)
@@ -65,9 +67,4 @@ def generate_training_example(move_set):
     return np.array(positions_train), np.array(moved_from_list), np.array(moved_to_list)
 
 training_ex1, from_list, to_list = generate_training_example(df)
-
-with h5py.File('training_set.hdf5', 'w') as f:
-    x_data = f.create_dataset('game1_x', data = training_ex1)
-    y1_data = f.create_dataset('game1_y1', data = from_list)
-    y2_data = f.create_dataset('game1_y2', data = to_list)
 #training_ex1.totxt()
